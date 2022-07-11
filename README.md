@@ -32,7 +32,17 @@ Whole-genome files are required to call TIM regions. If user-supplied regions ar
 | Input        | No atlas                                    | User atlas  |
 |--------------|---------------------------------------------|-------------|
 | No regions   | - call atlas from bedgraph<br/> - call TIMs | - call TIMs |
-| User regions | - cell atlas from epiread                   |             |
+| User regions | - call atlas from epiread                   |             |
+
+Regions and atlases used to create paper figures can be found under "resources". As mixtures are randomly generated,
+slight variation is to be expected. 
+
+Additional files:
+1) CpG coordinates file - this file contains all CpG coordinates (chromosome, start, end). 
+Must be sorted (sort -k1,1 -k2,2n). If atlas and regions are supplied, this may only include CpGs in and around regions
+   (relevant if read only partially overlaps region).
+2) Include list - only if atlas not supplied. Used to filter out low quality genomic regions.
+3) Genome file - is regions not supplied. Used for slopping TIMs. 
 
 ## Usage
 

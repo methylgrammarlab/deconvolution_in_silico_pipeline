@@ -4,6 +4,14 @@ import pandas as pd
 runs = pd.read_csv(config["run_file"]).set_index("param_id")
 param_ids = runs.index
 
+rule atlas_over_tims: #intersect with processed tim file
+    input:
+        tims=expand("results/{name}_processed_tims.txt", name=config["name"]),
+        atlas=expand("results/{name}_atlas.bedgraph", name=config["name"])
+    output:
+        expand("results/{name}_atlas_over_tims.txt", name=config["name"])
+    shell:
+        """bedtools intersect -a {input.atlas} -b {input.tims}  -u -header -sorted > {output}"""
 
 rule run_model:
     input:
