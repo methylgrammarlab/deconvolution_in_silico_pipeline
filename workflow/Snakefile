@@ -1,0 +1,21 @@
+##### setup report #####
+configfile: "config/config.json"
+
+
+##### load rules #####
+
+
+include: "rules/apply_models.smk"
+include: "rules/create_celfie_atlas.smk"
+include: "rules/in_silico_mixture.smk"
+include: "rules/process_tims.smk"
+
+
+##### target rules #####
+
+
+rule all:
+    input:
+        expand("results/{name}_alpha_estimates.tsv", name=config["name"]),
+
+

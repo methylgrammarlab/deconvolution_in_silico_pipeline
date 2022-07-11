@@ -1,0 +1,67 @@
+{
+  "run_file": "../config/debugging_depth_params.csv",
+  "name": "debug_tims",
+  "reps": 10,
+  "slop": 250,
+  "n_tims": 100,
+  "models": ["celfie", "celfie-plus"],
+  "cell_types": [ "Delta", "Duct", "Acinar", "Endothel", "Alpha", "Beta"],
+  "include_list": "/sci/labs/bermanb/ireneguberm/in-silico/TIMs/make-atlas/input/hg19-include_list.bed",
+  "genome": "/sci/labs/bermanb/ireneguberm/in-silico/TIMs/make-atlas/input/hg19.chrom.sizes.sorted",
+  "cpg_file": "/sci/labs/bermanb/ireneguberm/in-silico/TIMs/hg19.CpG.bed.sorted.gz",
+  "bedpaths": {
+              "Alpha":  ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Alpha-Z00000453.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Alpha-Z00000456.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Alpha-Z00000459.bedgraph"
+                      ],
+              "Beta": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Beta-Z00000452.bedgraph",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Beta-Z00000455.bedgraph",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Beta-Z00000458.bedgraph"
+                                            ],
+              "Delta": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Delta-Z00000451.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Delta-Z00000454.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Delta-Z00000457.bedgraph"
+                       ],
+              "Duct": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/methylation_extract/Pancreas-Duct-Z000000QZ.bedgraph",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Duct-Z0000043T.bedgraph",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Duct-Z0000043U.bedgraph",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Duct-Z0000043V.bedgraph"
+                        ],
+              "Acinar": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/methylation_extract/Pancreas-Acinar-Z000000QX.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Acinar-Z0000043W.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Acinar-Z0000043X.bedgraph",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Acinar-Z0000043Y.bedgraph"
+                        ],
+              "Endothel": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/methylation_extract/Pancreas-Endothel-Z0000042D.bedgraph",
+                          "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/methylation_extract/Pancreas-Endothel-Z0000042X.bedgraph",
+                          "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Endothel-Z00000430.bedgraph"
+                          ]
+  },
+  "epipaths": {"Alpha":  ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000453.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000456.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000459.epiread.gz"
+                      ],
+              "Beta": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Beta-Z00000452.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Beta-Z00000455.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Beta-Z00000458.epiread.gz"
+                      ],
+              "Delta": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Delta-Z00000451.epiread.gz",
+                       "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Delta-Z00000454.epiread.gz",
+                       "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Delta-Z00000457.epiread.gz"
+                       ],
+              "Duct": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Duct-Z000000QZ.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Duct-Z0000043T.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Duct-Z0000043U.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Duct-Z0000043V.epiread.gz"
+                        ],
+              "Acinar": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Acinar-Z000000QX.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Acinar-Z0000043W.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Acinar-Z0000043X.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Acinar-Z0000043Y.epiread.gz"
+                        ],
+              "Endothel": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Endothel-Z0000042D.epiread.gz",
+                          "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Endothel-Z0000042X.epiread.gz",
+                          "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Endothel-Z00000430.epiread.gz"
+                          ] }
+
+}
