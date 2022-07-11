@@ -18,6 +18,9 @@ intervals, hereby referred to as "regions". These regions should be differential
 types to enable deconvolution. There are many approaches to selecting an appropriate set of regions. Here, 
 if no user regions are supplied, [Tissue Informative Markers](https://github.com/christacaggiano/celfie) are called.
 
+Regions file should be BED-formatted and have no header. Regions may overlap. If they do - the overlapping section
+will be read twice. If this is not the desired behaviour, use [bedtools merge](https://bedtools.readthedocs.io/en/latest/content/tools/merge.html) to avoid overlap. 
+
 For CelFiE and CelFiE+, the atlas format should be METH, COV, as in [CelFiE](https://github.com/christacaggiano/celfie).
 A small pipeline to create such an atlas from bedgraph files is provided here. 
 

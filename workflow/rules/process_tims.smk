@@ -70,3 +70,7 @@ rule sum_tims:
 #     shell:
 #         """sbatch scripts/tim.sh -i {input} -o {output.raw} -s {output.summed} -w {params.slop} """+\
 #         """-n {config[n_tims]} -t {params.t} -d 15 -e 1"""
+
+#TODO:
+# no regions - atlas from bedgraph, find TIMs
+# user regions - atlas from epiread

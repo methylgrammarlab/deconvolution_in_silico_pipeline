@@ -1,12 +1,4 @@
-'''
-For each TIM, given alpha, sample from epiread files (tabix the region, randomly select reads)
-    - tabix out all TIMs from epiread, to have small files
-    - bedops --everything epireads of each cell type to one medium file
-    - calculate number of reads to get from each cell
-    - bedtools sample -i input.bed -n 1000
-    - merge to new epiread file
-'''
-#from TIM output need to remove header and slop tims
+
 import json
 import numpy as np
 import pandas as pd
@@ -31,14 +23,6 @@ def count_lines(wildcards):
         lines = len(foo.readlines())
     return lines
 
-
-rule measure_length:
-    input:
-        epireads=expand("interim/{cell_type}.epiread", cell_type=config["cell_types"])
-    output:
-        expand("interim/{name}_mean_cpgs_per_read.json", name=config["name"])
-    script:
-        "../scripts/measure_read_length.py"
 
 rule calculate_reads: #number to sample from each cell type
     input:
