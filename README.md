@@ -22,13 +22,17 @@ Regions file should be BED-formatted and have no header. Regions may overlap. If
 will be read twice. If this is not the desired behaviour, use [bedtools merge](https://bedtools.readthedocs.io/en/latest/content/tools/merge.html) to avoid overlap. 
 
 For CelFiE and CelFiE+, the atlas format should be METH, COV, as in [CelFiE](https://github.com/christacaggiano/celfie).
-A small pipeline to create such an atlas from bedgraph files is provided here. 
+A small pipeline to create such an atlas from bedgraph files is provided here. The atlas should include individual
+CpGs (this is the input for CelFiE+). Summing of methylation and coverage per region for CelFiE happens in [deconvolution_models](https://github.com/methylgrammarlab/deconvolution_models). 
 
 For epistate models, an epistate atlas is required. This is done separately, [here](https://github.com/methylgrammarlab/proj-epireads).
 
 Whole-genome files are required to call TIM regions. If user-supplied regions are used, the atlas may only cover the regions.
 
-
+| Input        | No atlas                                    | User atlas  |
+|--------------|---------------------------------------------|-------------|
+| No regions   | - call atlas from bedgraph<br/> - call TIMs | - call TIMs |
+| User regions | - cell atlas from epiread                   |             |
 
 ## Usage
 

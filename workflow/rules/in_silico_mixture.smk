@@ -41,7 +41,7 @@ rule calculate_reads: #number to sample from each cell type
     #this works: python3 mixture_simulator.py 10 584 '[0.04761905, 0.0952381 ,
     # 0.14285714, 0.19047619, 0.23809524, 0.28571429]' '[Alpha, Beta, Delta, Duct, Acinar, Endothel]' try.json
 
-rule assert_intersection: #make sure tabix and bedtools agree
+rule assert_intersection: #make sure tabix and bedtools agree #TODO: remove?
     input:
         epiread= lambda wildcards: LONG_PATH[wildcards.sample],
         tims=expand("results/{name}_processed_tims.txt", name=config["name"])
