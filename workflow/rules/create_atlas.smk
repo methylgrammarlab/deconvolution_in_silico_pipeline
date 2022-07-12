@@ -2,7 +2,7 @@
 
 rule epiread_to_bedgraph: #only for epiread
     input:
-        epiread="interim/{cell_type}.epiread.gz", #from in_silico_mixture.smk
+        epiread="interim/{cell_type}.epiread.gz", #from in_silico_mixture.smk #TODO: will not work for holdout samples!!!
         index="interim/{cell_type}.epiread.gz.tbi",
         cpg_file=config["cpg_file"],
         regions=config["regions_file"],

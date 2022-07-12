@@ -13,7 +13,8 @@ def get_atlas_file(wildcards): #TODO: change to import from one source
 
 rule run_model:
     input:
-        mixture=expand("data/{name}/{{param_id}}_rep{{instance_id}}_data.npy", name=config["name"]),
+        mixture=expand("results/mixtures/{name}_{{param_id}}_rep{{instance_id}}_mixture.epiread.gz", name=config["name"]),
+        index=expand("results/mixtures/{name}_{{param_id}}_rep{{instance_id}}_mixture.epiread.gz.tbi", name=config["name"]),
         atlas=get_atlas_file
     params:
         instance="{instance_id}",

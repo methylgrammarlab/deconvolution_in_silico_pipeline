@@ -1,7 +1,7 @@
 {
   "run_file": "resources/params/depth_params.csv",
   "name": "test",
-  "regions_file": "",
+  "regions_file": "/sci/labs/bermanb/ireneguberm/in-silico/TIMs/process-tims/output/grail_healthy_pancreas_processed_tims.txt",
   "atlas_file": "",
   "reps": 10,
   "slop": 250,
