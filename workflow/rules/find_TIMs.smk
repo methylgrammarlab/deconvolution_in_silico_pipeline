@@ -1,16 +1,23 @@
 
+def get_atlas_file(wildcards):
+    if config["atlas_file"]:
+        return config["atlas_file"]
+    else: #no user supplied atlas
+        return expand("results/{name}_atlas.bedgraph", name=config["name"])
+
 rule generate_tims:
     input:
-        expand("results/{name}_atlas.bedgraph", name=config["name"])
+        get_atlas_file
     params:
         t=len(config["cell_types"]),
         slop=int(config["slop"])*2
 
     output:
-        raw=expand("results/{name}_raw_tims.txt", name=config["name"]),
-        summed=expand("results/{name}_tims_summed.txt", name=config["name"])
+        raw=temp(expand("results/{name}_raw_tims.txt", name=config["name"])),
+        summed=temp(expand("results/{name}_tims_summed.txt", name=config["name"]))
+
     shell:
-        """sbatch scripts/tim.sh -i {input} -o {output.raw} -s {output.summed} -w {params.slop} """+\
+        """sbatch scripts/celfie_scripts/tim.sh -i {input} -o {output.raw} -s {output.summed} -w {params.slop} """+\
         """-n {config[n_tims]} -t {params.t} -d 15 -e 1"""
 
 rule remove_header:
@@ -20,7 +27,6 @@ rule remove_header:
         temp("tims_no_header.bed")
     run:
         shell("tail -n +2 {input.tim_file} | cut -f 1,2,3 > {output}")
-
 
 rule slop_tims:
     input:
@@ -37,6 +43,8 @@ rule sort_tims:
     input:
         "slopped_tims.bed"
     output:
-        "sorted_slopped_tims.bed"
+        expand("results/{name}_tims.txt", name=config["name"])
     shell:
         """bedtools sort -i {input} > {output}"""
+
+

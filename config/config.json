@@ -1,6 +1,8 @@
 {
   "run_file": "../config/debugging_depth_params.csv",
   "name": "debug_tims",
+  "regions_file": false,
+  "atlas_file": false,
   "reps": 10,
   "slop": 250,
   "n_tims": 100,

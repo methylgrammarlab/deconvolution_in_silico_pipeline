@@ -1,42 +1,66 @@
-'''
-create atlas for celfie from "methylation_extract" bedgraphs
-takes in bedgraphs formattted chrom start end %meth coverage
-final is chrom start end A_meth A_cov B_meth B_cov
-
-'''
-configfile: "atlas_config.json"
 
 
-from itertools import chain
-rule all:
+rule epiread_to_bedgraph: #only for epiread
     input:
-        expand("{outdir}/{name}_atlas.bedgraph", outdir=config["outdir"], name=config["name"])
-
-rule merge_and_sort_files:
-    #for unsorted input
-    input:
-        expand('{indir}/{{cell_type}}_paths.txt', indir=config["indir"])
+        epiread="interim/{cell_type}.epiread.gz", #from in_silico_mixture.smk
+        index="interim/{cell_type}.epiread.gz.tbi",
+        cpg_file=config["cpg_file"],
+        regions=config["user_regions"]
     output:
-        temp('interim/merged/merged_{cell_type}.bedgraph')
-    run:
-        with open(input[0], 'r') as infile:
-            bedgraphs = " ".join(infile.read().splitlines())
-        shell("bedops --everything {bedgraphs} > {output}")
+        'interim/merged/merged_{cell_type}_from_epiread.bedgraph'
+    shell:
+        """epireadToBedgraph --cpg_coordinates {input.cpg_file} --epireads"""+\
+        """ {input.epiread} --outfile {output} -b {input.regions}"""
 
-rule filter_excluded_regions: #filter with whitelist
+rule sort_files: #only for epiread
     input:
-        sorted_file='interim/merged/merged_{cell_type}.bedgraph',
+        'interim/merged/merged_{cell_type}_{method}.bedgraph'
+    output:
+        'interim/sorted/sorted_{cell_type}_{method}.bedgraph'
+    shell:
+        """sort -k1,1 -k2,2n {input} > {output}"""
+
+
+def get_bedgraph_paths(wildcards): #only for bedgraph
+    return config["bedpaths"][wildcards.cell_type]
+
+rule merge_and_sort_files: #only for bedgraph
+    input:
+        get_bedgraph_paths
+    output:
+        temp('interim/sorted/sorted_{cell_type}_from_bedgraph.bedgraph')
+    shell:
+        """sort -m -k1,1 -k2,2n {input} > {output}"""
+
+
+###############################################################################
+#common
+def epiread_or_bedgraph(wildcards):
+    if config["regions_file"]:
+        return f'interim/sorted/sorted_{wildcards.cell_type}_from_epiread.bedgraph'
+    else:
+        return f'interim/sorted/sorted_{wildcards.cell_type}_from_bedgraph.bedgraph'
+
+rule filter_excluded_regions: #filter with whitelist, optional
+    input:
+        sorted_file=epiread_or_bedgraph,
         include_regions=config["include_list"]
     output:
-        temp('interim/filtered/filtered_{cell_type}.bedgraph')
+        'interim/filtered/filtered_{cell_type}.bedgraph'
     shell:
-        """bedtools intersect -wa -a {input.sorted_file} -b {input.include_regions} > {output}"""
+        """bedtools intersect -u -a {input.sorted_file} -b {input.include_regions} > {output}"""
+
+def use_include_list(wildcards):
+    if config["include_list"]: #user-supplied regions to include
+        return f'interim/filtered/filtered_{wildcards.cell_type}.bedgraph'
+    else: #skip filtering step
+        return epiread_or_bedgraph(wildcards)
 
 rule format_merged_file:
     input:
-        'interim/filtered/filtered_{cell_type}.bedgraph'
+        use_include_list
     output:
-        temp('interim/formatted/formatted_{cell_type}.bedgraph')
+        'interim/formatted/formatted_{cell_type}.bedgraph'
     shell:
         """awk -v FS='\t' -v OFS='\t' '{{print $1,$2,$3,$4*$5,$5}}'  {input} > {output}"""
 
@@ -46,18 +70,18 @@ rule separate_strands:
         cpgs=config["cpg_file"],
         genome=config["genome"]
     output:
-        plus=temp('interim/stranded/plus_strand_{cell_type}.bedgraph'),
-        minus=temp('interim/stranded/minus_strand_{cell_type}.bedgraph')
+        plus='interim/stranded/plus_strand_{cell_type}.bedgraph',
+        minus='interim/stranded/minus_strand_{cell_type}.bedgraph'
     run:
-        shell("""bedtools intersect -v -wa -sorted -a {input.bedgraph} -b {input.cpgs} -g {input.genome} > {output.minus} """)
-        shell("""bedtools intersect -wa -sorted -a {input.bedgraph} -b {input.cpgs} -g {input.genome} > {output.plus} """)
+        shell("""bedtools intersect -v -sorted -a {input.bedgraph} -b {input.cpgs} -g {input.genome} > {output.minus} """)
+        shell("""bedtools intersect -u -sorted -a {input.bedgraph} -b {input.cpgs} -g {input.genome} > {output.plus} """)
 
 rule shift_minus_strand:
     input:
         minus='interim/stranded/minus_strand_{cell_type}.bedgraph',
         genome=config["genome"]
     output:
-        temp('interim/stranded/shifted_minus_strand_{cell_type}.bedgraph')
+        'interim/stranded/shifted_minus_strand_{cell_type}.bedgraph'
     shell:
         """bedtools shift -i {input.minus} -s -1 -g {input.genome} > {output}"""
 
@@ -67,9 +91,9 @@ rule cpg_filter: #only keep data aligned to cpg file
         cpgs = config["cpg_file"],
         genome=config["genome"]
     output:
-        temp('interim/stranded/shifted_filtered_minus_strand_{cell_type}.bedgraph')
+        'interim/stranded/shifted_filtered_minus_strand_{cell_type}.bedgraph'
     shell:
-        """bedtools intersect -wa -sorted -a {input.bedgraph} -b {input.cpgs} -g {input.genome} > {output} """
+        """bedtools intersect -u -sorted -a {input.bedgraph} -b {input.cpgs} -g {input.genome} > {output} """
 
 rule merge_sorted_files:
     #for input that is individually sorted
@@ -94,8 +118,8 @@ rule split_methylation_and_coverage:
     input:
         'interim/aggregated/aggregated_{cell_type}.bedgraph'
     output:
-        methylation=temp('interim/methylation/{cell_type}.bedgraph'),
-        coverage=temp('interim/coverage/{cell_type}.bedgraph')
+        methylation='interim/methylation/{cell_type}.bedgraph',
+        coverage='interim/coverage/{cell_type}.bedgraph'
     run:
         shell("""awk -v FS='\t' -v OFS='\t' '{{print $1,$2,$3,$4}}' {input} > {output.methylation}""")
         shell("""awk -v FS='\t' -v OFS='\t' '{{print $1,$2,$3,$5}}' {input} > {output.coverage}""")
@@ -105,8 +129,8 @@ rule unite_samples:
         methylation=expand('interim/methylation/{cell_type}.bedgraph', cell_type=config["cell_types"]),
         coverage=expand('interim/coverage/{cell_type}.bedgraph', cell_type=config["cell_types"])
     output:
-        methylation = temp(expand('interim/combined_methylation_{name}.bedgraph', name=config["name"])),
-        coverage = temp(expand('interim/combined_coverage_{name}.bedgraph', name=config["name"]))
+        methylation = expand('interim/combined_methylation_{name}.bedgraph', name=config["name"]),
+        coverage = expand('interim/combined_coverage_{name}.bedgraph', name=config["name"])
     run:
         methylation_header = "\t".join(["CHROM", "START", "END"] + [x+"_METH" for x in config["cell_types"]]) + "\n"
         coverage_header = "\t".join(["CHROM", "START", "END"] + [x+"_COV" for x in config["cell_types"]]) + "\n"
@@ -122,7 +146,7 @@ rule create_interim_files:
         methylation = expand('interim/combined_methylation_{name}.bedgraph', name=config["name"]),
         coverage = expand('interim/combined_coverage_{name}.bedgraph', name=config["name"])
     output:
-        pasted = temp(expand('interim/pasted_methylation_coverage_{name}.bedgraph', name=config["name"]))
+        pasted = expand('interim/pasted_methylation_coverage_{name}.bedgraph', name=config["name"])
     run:
         shell(""" paste {input.methylation} {input.coverage} > {output.pasted}""")
 
@@ -130,15 +154,10 @@ rule stitch_samples:
     input:
         expand('interim/pasted_methylation_coverage_{name}.bedgraph', name=config["name"])
     output:
-         expand("{outdir}/{name}_atlas.bedgraph", outdir=config["outdir"], name=config["name"]) #TODO: remove outdir
+         expand("results/{name}_atlas.bedgraph", name=config["name"])
     run:
         n = len(config["cell_types"])
         cols = list(range(1,4))+list(chain.from_iterable([(x, x+n+3) for x in range(4,4+n)]))
         cols = ['$'+str(x) for x in cols]
         cols = ",".join(cols)
         shell(""" awk -v FS='\t' -v OFS='\t' '{{print {cols} }}' {input} > {output} """)
-
-
-
-#TODO: reuse rules from atlas_from_epiread?
-#use rule * from other_workflow as other_*
