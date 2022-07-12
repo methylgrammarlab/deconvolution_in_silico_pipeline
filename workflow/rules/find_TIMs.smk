@@ -1,6 +1,6 @@
 
 def get_atlas_file(wildcards):
-    if config["atlas_file"]:
+    if len(config["atlas_file"]):
         return config["atlas_file"]
     else: #no user supplied atlas
         return expand("results/{name}_atlas.bedgraph", name=config["name"])

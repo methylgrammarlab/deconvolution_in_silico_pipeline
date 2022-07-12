@@ -1,11 +1,15 @@
 import numpy as np
 import pandas as pd
-from rules.find_tims import get_atlas_file
 
 
 runs = pd.read_csv(config["run_file"]).set_index("param_id")
 param_ids = runs.index
 
+def get_atlas_file(wildcards): #TODO: change to import from one source
+    if len(config["atlas_file"]):
+        return config["atlas_file"]
+    else: #no user supplied atlas
+        return expand("results/{name}_atlas.bedgraph", name=config["name"])
 
 rule run_model:
     input:
@@ -17,7 +21,7 @@ rule run_model:
     output:
         temp("interim/{param_id}_rep{instance_id}_{model}.npy")
     shell:
-        """deconvolution --model {wildcards.model}}""" #todo: add params
+        """deconvolution --model {wildcards.model} {run_config}""" #todo: make sure config works like this
 
 
 rule write_output:

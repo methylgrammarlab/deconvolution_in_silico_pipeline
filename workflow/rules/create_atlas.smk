@@ -5,12 +5,11 @@ rule epiread_to_bedgraph: #only for epiread
         epiread="interim/{cell_type}.epiread.gz", #from in_silico_mixture.smk
         index="interim/{cell_type}.epiread.gz.tbi",
         cpg_file=config["cpg_file"],
-        regions=config["user_regions"]
+        regions=config["regions_file"],
     output:
-        'interim/merged/merged_{cell_type}_from_epiread.bedgraph'
+        "interim/merged/merged_{cell_type}_from_epiread.bedgraph"
     shell:
-        """epireadToBedgraph --cpg_coordinates {input.cpg_file} --epireads"""+\
-        """ {input.epiread} --outfile {output} -b {input.regions}"""
+        """epireadToBedgraph --cpg_coordinates {input.cpg_file} --epireads {input.epiread} --outfile {output} -b {input.regions}"""
 
 rule sort_files: #only for epiread
     input:
@@ -36,7 +35,7 @@ rule merge_and_sort_files: #only for bedgraph
 ###############################################################################
 #common
 def epiread_or_bedgraph(wildcards):
-    if config["regions_file"]:
+    if len(config["regions_file"]):
         return f'interim/sorted/sorted_{wildcards.cell_type}_from_epiread.bedgraph'
     else:
         return f'interim/sorted/sorted_{wildcards.cell_type}_from_bedgraph.bedgraph'
@@ -51,7 +50,7 @@ rule filter_excluded_regions: #filter with whitelist, optional
         """bedtools intersect -u -a {input.sorted_file} -b {input.include_regions} > {output}"""
 
 def use_include_list(wildcards):
-    if config["include_list"]: #user-supplied regions to include
+    if len(config["include_list"]): #user-supplied regions to include
         return f'interim/filtered/filtered_{wildcards.cell_type}.bedgraph'
     else: #skip filtering step
         return epiread_or_bedgraph(wildcards)

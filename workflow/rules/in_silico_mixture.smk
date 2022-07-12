@@ -2,7 +2,6 @@
 import json
 import numpy as np
 import pandas as pd
-from rules.find_tims import get_atlas_file
 
 runs = pd.read_csv(config["run_file"]).set_index("param_id")
 param_ids = runs.index
@@ -15,6 +14,12 @@ for cell_type, paths in config["epipaths"].items():
         short = path.split("/")[-1].split(".")[0]
         LONG_PATH[short] = path
         SAMPLES_PER_TYPE[cell_type].append(short)
+
+def get_atlas_file(wildcards): #TODO: change to import from one source
+    if len(config["atlas_file"]):
+        return config["atlas_file"]
+    else: #no user supplied atlas
+        return expand("results/{name}_atlas.bedgraph", name=config["name"])
 
 def get_samples_per_type(wildcards):
     return ["small/" + wildcards.cell_type +"_"+ x + "_small_verified.epiread" for x in SAMPLES_PER_TYPE[wildcards.cell_type]]

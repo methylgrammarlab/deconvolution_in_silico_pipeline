@@ -7,6 +7,8 @@ configfile: "config/config.json"
 
 include: "rules/apply_models.smk"
 include: "rules/in_silico_mixture.smk"
+include: "rules/find_TIMs.smk"
+include: "rules/create_atlas.smk"
 
 ##### target rules #####
 
