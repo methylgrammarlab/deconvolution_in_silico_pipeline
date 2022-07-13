@@ -1,9 +1,52 @@
 
+# epiread file paths for atlas_from_epiread
+LONG_PATH = {}
+SAMPLES_PER_TYPE = {}
+for cell_type, paths in config["atlas_epipaths"].items():
+    SAMPLES_PER_TYPE[cell_type] = []
+    for path in paths:
+        short = path.split("/")[-1].split(".")[0]
+        LONG_PATH[short] = path
+        SAMPLES_PER_TYPE[cell_type].append(short)
+
+rule sort_regions_file:
+    input:
+         regions = config["regions_file"]
+    output:
+        temp("sorted_user_regions_file.bed")
+    shell:
+        """sort -k1,1 -k2,2n {input.regions} > {output}"""
+
+rule merge_regions_file: #if not merged, overlapping regions will get duplicated
+    input:
+        "sorted_user_regions_file.bed"
+    output:
+        temp("merged_user_regions_file.bed")
+    shell:
+        """bedtools merge -i {input.regions} > {output}"""
+
+rule cut_regions_from_epireads:
+    input:
+        epiread= lambda wildcards: LONG_PATH[wildcards.sample],
+        regions="merged_user_regions_file.bed"
+    output:
+        "small/{cell_type}_{sample}_small_verified.epiread"
+    shell:
+        """bedtools intersect -u -a {input.epiread} -b {input.regions}  | sort -k1,1 -k2,2n > {output}"""
+
+rule merge_bioreps: #one file for each cell type
+    input:
+        get_samples_per_type
+    output:
+        "interim/{cell_type}_atlas_epipaths.epiread"
+    run:
+        shell("""sort -m -k1,1 -k2,2n {input} > {output}""")
+
 
 rule epiread_to_bedgraph: #only for epiread
     input:
-        epiread="interim/{cell_type}.epiread.gz", #from in_silico_mixture.smk #TODO: will not work for holdout samples!!!
-        index="interim/{cell_type}.epiread.gz.tbi",
+        epiread="interim/{cell_type}_atlas_epipaths.epiread.gz",
+        index="interim/{cell_type}_atlas_epipaths.epiread.gz.tbi",
         cpg_file=config["cpg_file"],
         regions=config["regions_file"],
     output:
@@ -11,23 +54,18 @@ rule epiread_to_bedgraph: #only for epiread
     shell:
         """epireadToBedgraph --cpg_coordinates {input.cpg_file} --epireads {input.epiread} --outfile {output} -b {input.regions}"""
 
-rule sort_files: #only for epiread
-    input:
-        'interim/merged/merged_{cell_type}_{method}.bedgraph'
-    output:
-        'interim/sorted/sorted_{cell_type}_{method}.bedgraph'
-    shell:
-        """sort -k1,1 -k2,2n {input} > {output}"""
 
+###############################################################################
+#only for bedgraph
 
-def get_bedgraph_paths(wildcards): #only for bedgraph
+def get_bedgraph_paths(wildcards):
     return config["bedpaths"][wildcards.cell_type]
 
-rule merge_and_sort_files: #only for bedgraph
+rule merge_and_sort_files:
     input:
         get_bedgraph_paths
     output:
-        temp('interim/sorted/sorted_{cell_type}_from_bedgraph.bedgraph')
+        temp('interim/merged/merged_{cell_type}_from_bedgraph.bedgraph')
     shell:
         """sort -m -k1,1 -k2,2n {input} > {output}"""
 
@@ -36,9 +74,9 @@ rule merge_and_sort_files: #only for bedgraph
 #common
 def epiread_or_bedgraph(wildcards):
     if len(config["regions_file"]):
-        return f'interim/sorted/sorted_{wildcards.cell_type}_from_epiread.bedgraph'
+        return f'interim/merged/merged_{wildcards.cell_type}_from_epiread.bedgraph'
     else:
-        return f'interim/sorted/sorted_{wildcards.cell_type}_from_bedgraph.bedgraph'
+        return f'interim/merged/merged_{wildcards.cell_type}_from_bedgraph.bedgraph'
 
 rule filter_excluded_regions: #filter with whitelist, optional
     input:
@@ -113,7 +151,7 @@ rule aggregate_and_merge:
         'bedtools merge -d 0 -o sum -c 4,5  -i {input} > {output}'
 
 
-rule split_methylation_and_coverage:
+rule split_atlas_methylation_and_coverage:
     input:
         'interim/aggregated/aggregated_{cell_type}.bedgraph'
     output:
@@ -123,7 +161,7 @@ rule split_methylation_and_coverage:
         shell("""awk -v FS='\t' -v OFS='\t' '{{print $1,$2,$3,$4}}' {input} > {output.methylation}""")
         shell("""awk -v FS='\t' -v OFS='\t' '{{print $1,$2,$3,$5}}' {input} > {output.coverage}""")
 
-rule unite_samples:
+rule unite_atlas_samples:
     input:
         methylation=expand('interim/methylation/{cell_type}.bedgraph', cell_type=config["cell_types"]),
         coverage=expand('interim/coverage/{cell_type}.bedgraph', cell_type=config["cell_types"])
@@ -140,7 +178,7 @@ rule unite_samples:
         shell("""unionBedGraphs -i {input.methylation} >> {output.methylation}"""),
         shell("""unionBedGraphs -i {input.coverage} >> {output.coverage}"""),
 
-rule create_interim_files:
+rule create_interim_atlas_files:
     input:
         methylation = expand('interim/combined_methylation_{name}.bedgraph', name=config["name"]),
         coverage = expand('interim/combined_coverage_{name}.bedgraph', name=config["name"])
@@ -149,7 +187,7 @@ rule create_interim_files:
     run:
         shell(""" paste {input.methylation} {input.coverage} > {output.pasted}""")
 
-rule stitch_samples:
+rule create_final_atlas:
     input:
         expand('interim/pasted_methylation_coverage_{name}.bedgraph', name=config["name"])
     output:

@@ -39,7 +39,7 @@
                           "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/methylation_extract/Pancreas-Endothel-Z00000430.bedgraph"
                           ]
   },
-  "epipaths": {"Alpha":  ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000453.epiread.gz",
+  "mixture_epipaths": {"Alpha":  ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000453.epiread.gz",
                         "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000456.epiread.gz",
                         "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000459.epiread.gz"
                       ],

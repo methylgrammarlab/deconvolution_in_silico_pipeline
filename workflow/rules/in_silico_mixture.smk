@@ -6,9 +6,10 @@ import pandas as pd
 runs = pd.read_csv(config["run_file"]).set_index("param_id")
 param_ids = runs.index
 
+# epiread file paths for mixture. can be different from atlas (e.g. holdout samples)
 LONG_PATH = {}
 SAMPLES_PER_TYPE = {}
-for cell_type, paths in config["epipaths"].items():
+for cell_type, paths in config["mixture_epipaths"].items():
     SAMPLES_PER_TYPE[cell_type] = []
     for path in paths:
         short = path.split("/")[-1].split(".")[0]
@@ -29,7 +30,7 @@ def count_lines(wildcards):
         lines = len(foo.readlines())
     return lines
 
-rule measure_length: #TODO: replace with something better
+rule measure_length: #TODO: replace with something better?
     input:
         epireads=expand("interim/{cell_type}.epiread", cell_type=config["cell_types"])
     output:
@@ -82,14 +83,14 @@ rule merge_bioreps:
     input:
         get_samples_per_type
     output:
-        "interim/{cell_type}.epiread"
+        "interim/{cell_type}_mixture_epipaths.epiread"
     run:
         shell("""sort -m -k1,1 -k2,2n {input} | sed 's/$/\t{wildcards.cell_type}/' > {output}""")
         #adding source to each row
 
 rule sample_from_epiread:
     input:
-        epiread="interim/{cell_type}.epiread",
+        epiread="interim/{cell_type}_mixture_epipaths.epiread",
         counts=expand("interim/{name}_{{param_id}}_rep{{instance_id}}_read_number.json", name=config["name"])
     params:
         cell_type="{cell_type}"
