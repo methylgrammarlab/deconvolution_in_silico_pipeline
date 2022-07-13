@@ -1,8 +1,8 @@
 {
   "run_file": "resources/params/depth_params.csv",
   "name": "test",
-  "regions_file": "/sci/labs/bermanb/ireneguberm/in-silico/TIMs/process-tims/output/grail_healthy_pancreas_processed_tims.txt",
-  "atlas_file": "",
+  "regions_file": "",
+  "atlas_file": "/sci/labs/bermanb/ireneguberm/in-silico/TIMs/process-tims/output/grail_healthy_pancreas_processed_tims.txt",
   "reps": 10,
   "slop": 250,
   "n_tims": 100,
@@ -40,6 +40,32 @@
                           ]
   },
   "mixture_epipaths": {"Alpha":  ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000453.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000456.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000459.epiread.gz"
+                      ],
+              "Beta": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Beta-Z00000452.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Beta-Z00000455.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Beta-Z00000458.epiread.gz"
+                      ],
+              "Delta": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Delta-Z00000451.epiread.gz",
+                       "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Delta-Z00000454.epiread.gz",
+                       "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Delta-Z00000457.epiread.gz"
+                       ],
+              "Duct": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Duct-Z000000QZ.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Duct-Z0000043T.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Duct-Z0000043U.epiread.gz",
+                      "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Duct-Z0000043V.epiread.gz"
+                        ],
+              "Acinar": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Acinar-Z000000QX.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Acinar-Z0000043W.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Acinar-Z0000043X.epiread.gz",
+                        "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Acinar-Z0000043Y.epiread.gz"
+                        ],
+              "Endothel": ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Endothel-Z0000042D.epiread.gz",
+                          "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links6_pancreas/epireads/Pancreas-Endothel-Z0000042X.epiread.gz",
+                          "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Endothel-Z00000430.epiread.gz"
+                          ] },
+    "atlas_epipaths": {"Alpha":  ["/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000453.epiread.gz",
                         "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000456.epiread.gz",
                         "/sci/labs/bermanb/ekushele/icore-data/run_biscuit/results_nextflow_hg19_no_alt/GRAIL/GRAIL_all/links7/epireads/Pancreas-Alpha-Z00000459.epiread.gz"
                       ],

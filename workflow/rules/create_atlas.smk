@@ -1,47 +1,65 @@
 
 # epiread file paths for atlas_from_epiread
-LONG_PATH = {}
-SAMPLES_PER_TYPE = {}
-for cell_type, paths in config["atlas_epipaths"].items():
-    SAMPLES_PER_TYPE[cell_type] = []
-    for path in paths:
-        short = path.split("/")[-1].split(".")[0]
-        LONG_PATH[short] = path
-        SAMPLES_PER_TYPE[cell_type].append(short)
 
-rule sort_regions_file:
-    input:
-         regions = config["regions_file"]
-    output:
-        temp("sorted_user_regions_file.bed")
-    shell:
-        """sort -k1,1 -k2,2n {input.regions} > {output}"""
+def unpack_epipaths(epipaths):
+    '''
+    read config epiread paths
+    :param epipaths: config epiread paths
+    :return: short name to path, cell type to short name
+    '''
+    LONG_PATH = {}
+    SAMPLES_PER_TYPE = {}
+    for cell_type, paths in epipaths.items():
+        SAMPLES_PER_TYPE[cell_type] = []
+        for path in paths:
+            short = path.split("/")[-1].split(".")[0]
+            LONG_PATH[short] = path
+            SAMPLES_PER_TYPE[cell_type].append(short)
+    return LONG_PATH, SAMPLES_PER_TYPE
+
+LONG_PATH = {}
+if "atlas_epipaths" in config:
+    atlas_long_paths, atlas_samples_per_type = unpack_epipaths(config["atlas_epipaths"])
+    LONG_PATH.update(atlas_long_paths)
+if "mixture_epipaths" in config:
+    mixture_long_paths, mixture_samples_per_type = unpack_epipaths(config["mixture_epipaths"])
+    LONG_PATH.update(mixture_long_paths)
+
+def get_samples_per_type(wildcards):
+    if wildcards.target == "atlas":
+        return atlas_samples_per_type[wildcards.cell_type]
+    elif wildcards.target == "mixture":
+        return mixture_samples_per_type[wildcards.cell_type]
+    else:
+        raise ValueError("target wildcard unknown")
 
 rule merge_regions_file: #if not merged, overlapping regions will get duplicated
     input:
-        "sorted_user_regions_file.bed"
+        "sorted_regions_file.bed"
     output:
-        temp("merged_user_regions_file.bed")
+        temp("merged_regions_file.bed")
     shell:
         """bedtools merge -i {input.regions} > {output}"""
 
 rule cut_regions_from_epireads:
     input:
         epiread= lambda wildcards: LONG_PATH[wildcards.sample],
-        regions="merged_user_regions_file.bed"
+        regions="merged_regions_file.bed"
     output:
         "small/{cell_type}_{sample}_small_verified.epiread"
     shell:
         """bedtools intersect -u -a {input.epiread} -b {input.regions}  | sort -k1,1 -k2,2n > {output}"""
 
-rule merge_bioreps: #one file for each cell type
+rule merge_bioreps:
     input:
-        get_samples_per_type
+        lambda wildcards: expand("small/{{cell_type}}_{sample}_small_verified.epiread", sample=get_samples_per_type(wildcards))
     output:
-        "interim/{cell_type}_atlas_epipaths.epiread"
+        "interim/{cell_type}_{target}_epipaths.epiread"
     run:
-        shell("""sort -m -k1,1 -k2,2n {input} > {output}""")
+        shell("""sort -m -k1,1 -k2,2n {input} | sed 's/$/\t{wildcards.cell_type}/' > {output}""")
+        #adding source to each row
 
+###############################################################################
 
 rule epiread_to_bedgraph: #only for epiread
     input:

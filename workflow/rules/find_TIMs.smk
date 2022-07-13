@@ -1,5 +1,5 @@
 
-def get_atlas_file(wildcards):
+def get_atlas_file(wildcards): #TODO: move/remove
     if len(config["atlas_file"]):
         return config["atlas_file"]
     else: #no user supplied atlas
@@ -35,16 +35,7 @@ rule slop_tims:
     params:
         slop=config["slop"]
     output:
-        temp("slopped_tims.bed")
-    shell:
-        """bedtools slop -b {params.slop} -i {input.tims} -g {input.genome} > {output}"""
-
-rule sort_tims:
-    input:
-        "slopped_tims.bed"
-    output:
         expand("results/{name}_tims.txt", name=config["name"])
     shell:
-        """bedtools sort -i {input} > {output}"""
-
+        """bedtools slop -b {params.slop} -i {input.tims} -g {input.genome} > {output}"""
 
