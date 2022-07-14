@@ -35,7 +35,7 @@ def get_samples_per_type(wildcards):
 
 rule merge_regions_file: #if not merged, overlapping regions will get duplicated
     input:
-        "sorted_regions_file.bed"
+        regions="sorted_regions_file.bed"
     output:
         temp("merged_regions_file.bed")
     shell:
@@ -66,11 +66,11 @@ rule epiread_to_bedgraph: #only for epiread
         epiread="interim/{cell_type}_atlas_epipaths.epiread.gz",
         index="interim/{cell_type}_atlas_epipaths.epiread.gz.tbi",
         cpg_file=config["cpg_file"],
-        regions=config["regions_file"],
+        regions="merged_regions_file.bed",
     output:
         "interim/merged/merged_{cell_type}_from_epiread.bedgraph"
     shell:
-        """epireadToBedgraph --cpg_coordinates {input.cpg_file} --epireads {input.epiread} --outfile {output} -b {input.regions}"""
+        """epireadToBedgraph --cpg_coordinates={input.cpg_file} --epiread_files={input.epiread} --outfile={output} -b --genomic_intervals={input.regions}"""
 
 
 ###############################################################################

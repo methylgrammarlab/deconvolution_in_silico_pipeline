@@ -24,6 +24,9 @@ def main(epireads, outpath):
     with open(outpath, "w") as outfile:
         json.dump(res, outfile)
 
-epireads = snakemake.input.epireads
-outpath=snakemake.output[0]
-main(epireads, outpath)
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('epireads', action="store", nargs="+", type=str)
+parser.add_argument('--outfile', type=str)
+args = parser.parse_args()
+main(args.epireads, args.outfile)

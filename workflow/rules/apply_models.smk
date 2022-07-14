@@ -1,21 +1,17 @@
 import numpy as np
 import pandas as pd
+import json
 
 
 runs = pd.read_csv(config["run_file"]).set_index("param_id")
 param_ids = runs.index
 
-def get_atlas_file(wildcards):
-    if len(config["atlas_file"]):
-        return config["atlas_file"]
-    else: #no user supplied atlas
-        return expand("results/{name}_atlas.bedgraph", name=config["name"])
 
 def get_regions_file(wildcards):
     if len(config["regions_file"]):
         return config["regions_file"]
     else:
-        return expand("results/{name}_tims.txt", name=config["name"])
+        return expand("results/{name}_tims.txt", name=config["name"])[0]
 
 rule sort_regions_file:
     input:
@@ -25,29 +21,34 @@ rule sort_regions_file:
     shell:
         """sort -k1,1 -k2,2n {input.regions} > {output}"""
 
-rule atlas_over_regions: #intersect with processed tim file
-    input:
-        regions="sorted_regions_file.bed", #should be sorted
-        atlas=get_atlas_file
-    output:
-        expand("results/{name}_atlas_over_regions.txt", name=config["name"])
-    shell:
-        """bedtools intersect -a {input.atlas} -b {input.regions}  -u -header -sorted > {output}"""
 
-rule run_model:
+rule create_run_config:
     input:
         mixture=expand("results/mixtures/{name}_{{param_id}}_rep{{instance_id}}_mixture.epiread.gz", name=config["name"]),
         index=expand("results/mixtures/{name}_{{param_id}}_rep{{instance_id}}_mixture.epiread.gz.tbi", name=config["name"]),
-        atlas=get_atlas_file,
+        atlas=expand("results/{name}_atlas_over_regions.txt", name=config["name"]),
         regions=get_regions_file #not merged
     params:
-        instance="{instance_id}",
-        run_config=lambda wildcards: runs[runs.index == int(wildcards.param_id)].iloc[0,:].to_dict()
+        run_config = lambda wildcards: runs[runs.index == int(wildcards.param_id)].iloc[0, :].to_dict()
+    output:
+        temp("interim/{param_id}_rep{instance_id}_run_config.json")
+    run:
+        basic_config = {"bedfile":True, "header":False,"cpg_coordinates":config["cpg_file"]}
+        basic_config.update(params.run_config)
+        basic_config["epiread_files"] = input.mixture
+        basic_config["epiformat"] = config["epiformat"]
+        basic_config["atlas_file"] = input.atlas[0]
+        basic_config["genomic_intervals"] = input.regions
+        with open(output[0], "w") as outfile:
+            json.dump(basic_config, outfile)
+
+rule run_model:
+    input:
+        "interim/{param_id}_rep{instance_id}_run_config.json"
     output:
         temp("interim/{param_id}_rep{instance_id}_{model}.npy")
     shell:
-        """deconvolution --model {wildcards.model} {run_config}""" #todo: make sure config works like this
-
+        """deconvolution --model {wildcards.model} -j {input} outfile={output}"""
 
 rule write_output:
     input:

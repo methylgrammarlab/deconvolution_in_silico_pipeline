@@ -41,7 +41,7 @@ done
 
 #### run tim caller
 ### python tim.py <input file> <output file> <# of tim/tissue> <# of tissues> <depth filter> <max # of missing>
-python scripts/tim.py $input_file $output_file $number_tims $number_tissues $depth_filter $na_filter
+python3 workflow/scripts/celfie_scripts/tim.py $input_file $output_file $number_tims $number_tissues $depth_filter $na_filter
 
 
 #### sum reference data into window
@@ -57,7 +57,7 @@ bedtools sort -i $output_file"_"$window_size > $output_file"_sorted"
 bedtools intersect -a $input_file -b $output_file"_sorted" > $input_file"_tims"
 
 ### sum all CpGs in a region together 
-python scripts/sum_by_list.py $output_file"_sorted" $input_file"_tims" $summed_file $number_tissues
+python3 workflow/scripts/celfie_scripts/sum_by_list.py $output_file"_sorted" $input_file"_tims" $summed_file $number_tissues
 
 ##### remove intermediate files
 rm $input_file"_tims"

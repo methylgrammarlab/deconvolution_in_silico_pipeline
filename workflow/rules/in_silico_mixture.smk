@@ -16,8 +16,8 @@ rule measure_length: #TODO: replace with something better?
         epireads=expand("interim/{cell_type}_mixture_epipaths.epiread", cell_type=config["cell_types"])
     output:
         expand("interim/{name}_mean_cpgs_per_read.json", name=config["name"])
-    script:
-        "scripts/measure_read_length.py"
+    shell:
+        """python3 workflow/scripts/measure_read_length.py {input.epireads} --outfile {output}"""
 
 
 rule calculate_reads: #number to sample from each cell type
@@ -32,7 +32,7 @@ rule calculate_reads: #number to sample from each cell type
         expand("interim/{name}_{{param_id}}_rep{{instance_id}}_read_number.json", name=config["name"])
     run:
         n_cpgs = count_lines(next(shell("echo {input.cpgs}", iterable=True)))
-        shell("""python3 scripts/mixture_simulator.py {input.lengths} {params.coverage}"""+\
+        shell("""python3 workflow/scripts/mixture_simulator.py {input.lengths} {params.coverage}"""+\
               """ {n_cpgs} '{params.alpha}' '{params.cell_types}' {output}""")
     #this works: python3 mixture_simulator.py 10 584 '[0.04761905, 0.0952381 ,
     # 0.14285714, 0.19047619, 0.23809524, 0.28571429]' '[Alpha, Beta, Delta, Duct, Acinar, Endothel]' try.json
