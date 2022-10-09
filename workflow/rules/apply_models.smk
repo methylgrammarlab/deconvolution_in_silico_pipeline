@@ -21,12 +21,21 @@ rule sort_regions_file:
     shell:
         """sort -k1,1 -k2,2n {input.regions} > {output}"""
 
+rule merge_regions_file:
+    input:
+        "sorted_regions_file.bed"
+    output:
+        "merged_sorted_regions_file.bed"
+    shell:
+        """bedtools merge -i {input} > {output}"""
 
 rule create_run_config:
     input:
         mixture=expand("results/mixtures/{name}_{{param_id}}_rep{{instance_id}}_mixture.epiread.gz", name=config["name"]),
         index=expand("results/mixtures/{name}_{{param_id}}_rep{{instance_id}}_mixture.epiread.gz.tbi", name=config["name"]),
         atlas=expand("results/{name}_atlas_over_regions.txt", name=config["name"]),
+        lambdas= expand("results/{name}_lambdas.bedgraph",name=config["name"]),,
+        thetas= expand("results/{name}_thetas.bedgraph",name=config["name"]),
         regions=get_regions_file #not merged
     params:
         run_config = lambda wildcards: runs[runs.index == int(wildcards.param_id)].iloc[0, :].to_dict()
@@ -39,6 +48,8 @@ rule create_run_config:
         basic_config["epiformat"] = config["epiformat"]
         basic_config["atlas_file"] = input.atlas[0]
         basic_config["genomic_intervals"] = input.regions
+        basic_config["lanbdas"] = input.lambdas[0]
+        basic_config["thetas"] = input.thetas[0]
         with open(output[0], "w") as outfile:
             json.dump(basic_config, outfile)
 

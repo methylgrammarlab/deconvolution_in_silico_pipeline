@@ -1,3 +1,4 @@
+from bimodal_detector import AtlasEstimator
 
 def get_atlas_file(wildcards): #TODO: move/remove
     if len(config["atlas_file"]):
@@ -43,9 +44,32 @@ rule slop_tims:
 
 rule atlas_over_regions: #intersect with processed tim file
     input:
-        regions="sorted_regions_file.bed", #should be sorted
+        regions="merged_sorted_regions_file.bed", #should be sorted
         atlas=get_atlas_file
     output:
         expand("results/{name}_atlas_over_regions.txt", name=config["name"])
     shell:
         """bedtools intersect -a {input.atlas} -b {input.regions}  -u -header -sorted > {output}"""
+
+
+#only for epiread models
+rule create_epistate_atlas:
+    input:
+        regions = "merged_sorted_regions_file.bed"
+    output:
+        lambdas = expand("results/{name}_lambdas.bedgraph", name=config["name"]),
+        thetas = expand("results/{name}_thetas.bedgraph", name=config["name"])
+    run:
+        epiread_files = []
+        labels = []
+        for cell_type, v in config["atlas_epipaths"].items():
+            for path in v:
+                epiread_files.append(path)
+                labels.append(cell_type)
+        basic_config = {"genomic_intervals":input.regions, "cpg_coordiantes":config["cpg_file"],
+                        "cell_types":config["cell_types"],
+                  "epiread_files":epiread_files, "labels":labels, "outdir":"results", "name":config["name"],
+                "epiformat":config["epiformat"], "header":False, "bedfile":True, "parse_snps": False,
+        "get_pp":False, "walk_on_list": False,"verbose" : False}
+        runner = AtlasEstimator(config)
+        runner.run()
