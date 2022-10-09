@@ -1,4 +1,7 @@
 
+
+##################################################
+
 # epiread file paths for atlas_from_epiread
 
 def unpack_epipaths(epipaths):
@@ -46,13 +49,13 @@ rule cut_regions_from_epireads:
         epiread= lambda wildcards: LONG_PATH[wildcards.sample],
         regions="merged_regions_file.bed"
     output:
-        "small/{cell_type}_{sample}_small_verified.epiread"
+        "interim/small/{cell_type}_{sample}_small_verified.epiread"
     shell:
         """bedtools intersect -u -a {input.epiread} -b {input.regions}  | sort -k1,1 -k2,2n > {output}"""
 
 rule merge_bioreps:
     input:
-        lambda wildcards: expand("small/{{cell_type}}_{sample}_small_verified.epiread", sample=get_samples_per_type(wildcards))
+        lambda wildcards: expand("interim/small/{{cell_type}}_{sample}_small_verified.epiread", sample=get_samples_per_type(wildcards))
     output:
         "interim/{cell_type}_{target}_epipaths.epiread"
     run:
