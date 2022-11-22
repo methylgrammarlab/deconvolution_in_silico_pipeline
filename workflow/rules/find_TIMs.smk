@@ -1,4 +1,4 @@
-from bimodal_detector import AtlasEstimator
+from bimodal_detector.runners import AtlasEstimator
 
 def get_atlas_file(wildcards): #TODO: move/remove
     if len(config["atlas_file"]):
@@ -18,7 +18,7 @@ rule generate_tims:
         summed=temp(expand("results/{name}_tims_summed.txt", name=config["name"]))
 
     shell:
-        """sbatch workflow/scripts/celfie_scripts/tim.sh -i {input[0]} -o {output.raw} -s {output.summed} -w {params.slop} """+\
+        """srun workflow/scripts/celfie_scripts/tim.sh -i {input[0]} -o {output.raw} -s {output.summed} -w {params.slop} """+\
         """-n {config[n_tims]} -t {params.t} -d 15 -e 1"""
 
 #sbatch workflow/scripts/celfie_scripts/tim.sh -i results/test_atlas_.bedgraph -o results/test_raw_tims_cl.txt -s results/test_raw_tims_summed_cl.txt -w 500 -n 100 -t 6 -d 15 -e 1
@@ -44,7 +44,7 @@ rule slop_tims:
 
 rule atlas_over_regions: #intersect with processed tim file
     input:
-        regions="merged_sorted_regions_file.bed", #should be sorted
+        regions=expand("results/{name}_merged_regions_file.bed", name=config["name"]), #should be sorted
         atlas=get_atlas_file
     output:
         expand("results/{name}_atlas_over_regions.txt", name=config["name"])
@@ -55,7 +55,7 @@ rule atlas_over_regions: #intersect with processed tim file
 #only for epiread models
 rule create_epistate_atlas:
     input:
-        regions = "merged_sorted_regions_file.bed"
+        regions = expand("results/{name}_merged_regions_file.bed", name=config["name"])
     output:
         lambdas = expand("results/{name}_lambdas.bedgraph", name=config["name"]),
         thetas = expand("results/{name}_thetas.bedgraph", name=config["name"])
@@ -66,10 +66,10 @@ rule create_epistate_atlas:
             for path in v:
                 epiread_files.append(path)
                 labels.append(cell_type)
-        basic_config = {"genomic_intervals":input.regions, "cpg_coordiantes":config["cpg_file"],
+        basic_config = {"genomic_intervals":input.regions[0], "cpg_coordinates":config["cpg_file"],
                         "cell_types":config["cell_types"],
                   "epiread_files":epiread_files, "labels":labels, "outdir":"results", "name":config["name"],
                 "epiformat":config["epiformat"], "header":False, "bedfile":True, "parse_snps": False,
         "get_pp":False, "walk_on_list": False,"verbose" : False}
-        runner = AtlasEstimator(config)
+        runner = AtlasEstimator(basic_config)
         runner.run()

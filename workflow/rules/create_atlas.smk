@@ -40,14 +40,14 @@ rule merge_regions_file: #if not merged, overlapping regions will get duplicated
     input:
         regions="sorted_regions_file.bed"
     output:
-        temp("merged_regions_file.bed")
+        expand("results/{name}_merged_regions_file.bed", name=config["name"])
     shell:
         """bedtools merge -i {input.regions} > {output}"""
 
 rule cut_regions_from_epireads:
     input:
         epiread= lambda wildcards: LONG_PATH[wildcards.sample],
-        regions="merged_regions_file.bed"
+        regions=expand("results/{name}_merged_regions_file.bed", name=config["name"])
     output:
         "interim/small/{cell_type}_{sample}_small_verified.epiread"
     shell:
@@ -69,11 +69,11 @@ rule epiread_to_bedgraph: #only for epiread
         epiread="interim/{cell_type}_atlas_epipaths.epiread.gz",
         index="interim/{cell_type}_atlas_epipaths.epiread.gz.tbi",
         cpg_file=config["cpg_file"],
-        regions="merged_regions_file.bed",
+        regions=expand("results/{name}_merged_regions_file.bed", name=config["name"])
     output:
         "interim/merged/merged_{cell_type}_from_epiread.bedgraph"
     shell:
-        """epireadToBedgraph --cpg_coordinates={input.cpg_file} --epiread_files={input.epiread} --outfile={output} -b --genomic_intervals={input.regions}"""
+        """epireadToBedgraph -A --cpg_coordinates={input.cpg_file} --epiread_files={input.epiread} --outfile={output} -b --genomic_intervals={input.regions}"""
 
 
 ###############################################################################
