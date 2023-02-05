@@ -55,20 +55,17 @@ rule atlas_over_regions: #intersect with processed tim file
 #only for epiread models
 rule create_epistate_atlas:
     input:
-        regions = expand("results/{name}_merged_regions_file.bed", name=config["name"])
+        regions = expand("results/{name}_merged_regions_file.bed", name=config["name"]),
+        epireads=expand("interim/{cell_type}_atlas_epipaths.epiread.gz", cell_type=config["cell_types"]),
+        index=expand("interim/{cell_type}_atlas_epipaths.epiread.gz.tbi", cell_type=config["cell_types"])
     output:
         lambdas = expand("results/{name}_lambdas.bedgraph", name=config["name"]),
         thetas = expand("results/{name}_thetas.bedgraph", name=config["name"])
     run:
-        epiread_files = []
-        labels = []
-        for cell_type, v in config["atlas_epipaths"].items():
-            for path in v:
-                epiread_files.append(path)
-                labels.append(cell_type)
         basic_config = {"genomic_intervals":input.regions[0], "cpg_coordinates":config["cpg_file"],
                         "cell_types":config["cell_types"],
-                  "epiread_files":epiread_files, "labels":labels, "outdir":"results", "name":config["name"],
+                  "epiread_files":input.epireads, "labels":config["cell_types"],
+                        "outdir":"results", "name":config["name"],
                 "epiformat":config["epiformat"], "header":False, "bedfile":True, "parse_snps": False,
         "get_pp":False, "walk_on_list": False,"verbose" : False}
         runner = AtlasEstimator(basic_config)

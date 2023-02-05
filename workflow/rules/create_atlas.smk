@@ -73,18 +73,18 @@ rule cut_regions_from_epireads:
         epiread= lambda wildcards: LONG_PATH[wildcards.sample],
         regions=expand("results/{name}_merged_regions_file.bed", name=config["name"])
     output:
-        "interim/small/{cell_type}_{sample}_small_verified.epiread"
+        "interim/small/{cell_type}_sample_{sample}_small_verified.epiread"
     shell:
         """bedtools intersect -u -a {input.epiread} -b {input.regions}  | sort -k1,1 -k2,2n > {output}"""
 
 rule merge_bioreps:
     input:
-        lambda wildcards: expand("interim/small/{{cell_type}}_{sample}_small_verified.epiread", sample=get_samples_per_type(wildcards))
+        lambda wildcards: expand("interim/small/{{cell_type}}_sample_{sample}_small_verified.epiread", sample=get_samples_per_type(wildcards))
     output:
         "interim/{cell_type}_{target}_epipaths.epiread"
     run:
         shell("""sort -m -k1,1 -k2,2n {input} | sed 's/$/\t{wildcards.cell_type}/' > {output}""")
-        #adding source to each row
+        #adding origin to each row
 
 ###############################################################################
 
