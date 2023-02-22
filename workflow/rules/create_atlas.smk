@@ -64,9 +64,17 @@ rule merge_regions_file: #if not merged, overlapping regions will get duplicated
     input:
         regions="sorted_regions_file.bed"
     output:
-        expand("results/{name}_merged_regions_file.bed", name=config["name"])
+        temp("merged_regions_file.bed")
     shell:
         """bedtools merge -i {input.regions} > {output}"""
+
+rule remove_sex_chromosomes:
+    input:
+        regions="merged_regions_file.bed"
+    output:
+        expand("results/{name}_merged_regions_file.bed", name=config["name"])
+    shell:
+        """awk '{{if ($1 != "chrY") print}}' {input.regions} | awk '{{if ($1 != "chrX") print}}' > {output}"""
 
 rule cut_regions_from_epireads:
     input:

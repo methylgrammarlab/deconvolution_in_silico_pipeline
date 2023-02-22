@@ -1,4 +1,4 @@
-from bimodal_detector.runners import AtlasEstimator
+from bimodal_detector.runners import AtlasEstimator, UXM_Estimator
 
 def get_atlas_file(wildcards): #TODO: move/remove
     if len(config["atlas_file"]):
@@ -69,4 +69,23 @@ rule create_epistate_atlas:
                 "epiformat":config["epiformat"], "header":False, "bedfile":True, "parse_snps": False,
         "get_pp":False, "walk_on_list": False,"verbose" : False}
         runner = AtlasEstimator(basic_config)
+        runner.run()
+
+# only for UXM
+rule create_uxm_atlas:
+    input:
+        regions = expand("results/{name}_merged_regions_file.bed", name=config["name"]),
+        epireads=expand("interim/{cell_type}_atlas_epipaths.epiread.gz", cell_type=config["cell_types"]),
+        index=expand("interim/{cell_type}_atlas_epipaths.epiread.gz.tbi", cell_type=config["cell_types"])
+    output:
+        lambdas = expand("results/{name}_percent_U.bedgraph", name=config["name"]),
+    run:
+        basic_config = {"genomic_intervals":input.regions[0], "cpg_coordinates":config["cpg_file"],
+                        "cell_types":config["cell_types"],
+                  "epiread_files":input.epireads, "labels":config["cell_types"],
+                        "outdir":"results", "name":config["name"],
+                "epiformat":config["epiformat"], "header":False, "bedfile":True, "parse_snps": False,
+        "get_pp":False, "walk_on_list": False,"verbose" : False,
+                        "u_threshold":config["u_threshold"], "min_length":config["min_length"]}
+        runner = UXM_Estimator(basic_config)
         runner.run()

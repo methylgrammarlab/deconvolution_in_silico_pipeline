@@ -62,6 +62,7 @@ rule create_run_config:
         atlas=expand("results/{name}_atlas_over_regions.txt", name=config["name"]),
         lambdas= expand("results/{name}_lambdas.bedgraph",name=config["name"]),
         thetas= expand("results/{name}_thetas.bedgraph",name=config["name"]),
+        percent_u= expand("results/{name}_percent_U.bedgraph",name=config["name"]),
         regions=expand("results/{name}_merged_regions_file.bed", name=config["name"])
     params:
         run_config = lambda wildcards: runs[runs.index == int(wildcards.param_id)].iloc[0, :].to_dict()
@@ -74,7 +75,9 @@ rule create_run_config:
         basic_config["epiformat"] = config["epiformat"]
         basic_config["atlas_file"] = input.atlas[0]
         basic_config["genomic_intervals"] = input.regions[0]
+        basic_config["cell_types"] = config["cell_types"]
         basic_config["lambdas"] = input.lambdas[0]
+        basic_config["percent_u"] = input.percent_u[0]
         basic_config["thetas"] = input.thetas[0]
         with open(output[0], "w") as outfile:
             json.dump(basic_config, outfile, cls=NpEncoder)
