@@ -27,6 +27,7 @@
 # SOFTWARE.
 # ###################################################
 
+from itertools import chain
 
 def unpack_epipaths(epipaths):
     '''

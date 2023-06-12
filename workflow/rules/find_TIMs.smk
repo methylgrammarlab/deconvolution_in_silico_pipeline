@@ -21,7 +21,6 @@ rule generate_tims:
         """srun workflow/scripts/celfie_scripts/tim.sh -i {input[0]} -o {output.raw} -s {output.summed} -w {params.slop} """+\
         """-n {config[n_tims]} -t {params.t} -d 15 -e 1"""
 
-#sbatch workflow/scripts/celfie_scripts/tim.sh -i results/test_atlas_.bedgraph -o results/test_raw_tims_cl.txt -s results/test_raw_tims_summed_cl.txt -w 500 -n 100 -t 6 -d 15 -e 1
 
 rule remove_header:
     input:

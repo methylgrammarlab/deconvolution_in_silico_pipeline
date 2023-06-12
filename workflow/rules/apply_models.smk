@@ -69,7 +69,7 @@ rule create_run_config:
     output:
         temp("interim/{param_id}_rep{instance_id}_run_config.json")
     run:
-        basic_config = {"bedfile":True, "header":False,"cpg_coordinates":config["cpg_file"]}
+        basic_config = {"bedfile":True, "header":False,"cpg_coordinates":config["cpg_file"], "npy":True}
         basic_config.update(params.run_config)
         basic_config["epiread_files"] = input.mixture
         basic_config["epiformat"] = config["epiformat"]
@@ -78,8 +78,6 @@ rule create_run_config:
         basic_config["cell_types"] = config["cell_types"]
         basic_config["lambdas"] = input.lambdas[0]
         basic_config["percent_u"] = input.percent_u[0]
-        # basic_config["min_length"] = config["min_length"]
-        # basic_config["u_threshold"] = config["u_threshold"]
         basic_config["weights"] = config["weights"]
         basic_config["thetas"] = input.thetas[0]
         with open(output[0], "w") as outfile:
