@@ -48,7 +48,7 @@ rule measure_length: #TODO: replace with something better?
 rule calculate_reads: #number to sample from each cell type
     input:
         cpgs=expand("results/{name}_atlas_over_regions.txt", name=config["name"]), #number of cpgs to cover
-        lengths=expand("interim/{name}_mean_cpgs_per_read.json", name=config["name"]) #TODO: where is this?
+        lengths=expand("interim/{name}_mean_cpgs_per_read.json", name=config["name"])
     params:
         coverage=lambda wildcards: str(runs.depth[runs.index == int(wildcards.param_id)].values[0]),
         alpha = lambda wildcards: str(runs.true_alpha[runs.index == int(wildcards.param_id)].values[0]),

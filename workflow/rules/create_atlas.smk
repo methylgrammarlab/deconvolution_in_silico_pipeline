@@ -106,7 +106,7 @@ rule epiread_to_bedgraph: #only for epiread
     output:
         "interim/merged/merged_{cell_type}_from_epiread.bedgraph"
     shell:
-        """epireadToBedgraph -A --cpg_coordinates={input.cpg_file} --epiread_files={input.epiread} --outfile={output} -b --genomic_intervals={input.regions}"""
+        """epireadToBedgraph -A --cpg_coordinates={input.cpg_file} --epiread_files={input.epiread} --outfile={output} -b -i={input.regions}"""
 
 
 ###############################################################################
